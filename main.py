@@ -31,12 +31,12 @@ async def predict_total(input_data: InputDataTotal):
     
     # Make predictions
     prediction_total = model_total.predict(input_features)
-    prediction_total_extended = model_total_extended.predict(input_features)
+    #prediction_total_extended = model_total_extended.predict(input_features)
 
     # Return predictions
     return {
         "prediction_total": prediction_total.tolist(),
-        "prediction_total_extended": prediction_total_extended.tolist(),
+        #"prediction_total_extended": prediction_total_extended.tolist(),
     }
 
 @app.post("/predict/count/")
