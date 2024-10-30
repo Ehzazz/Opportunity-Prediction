@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
-
+import pandas as pd
 
 # Load your trained models
 model_total = joblib.load('model_total.pkl')
@@ -35,8 +35,8 @@ async def predict_total(input_data: InputDataTotal):
 
     # Return predictions
     return {
-        "prediction_total_Amount": prediction_total.tolist(),
-        "prediction_total_Amount_extended": prediction_total_extended.tolist(),
+        "prediction_total": prediction_total.tolist(),
+        "prediction_total_extended": prediction_total_extended.tolist(),
     }
 
 @app.post("/predict/count/")
@@ -56,8 +56,8 @@ async def predict_count(input_data: InputDataCount):
 
     # Return predictions
     return {
-        "Number of opportunities Won": prediction_count.tolist(),
-        "Number of Opportuniites won 2025": prediction_count_extended.tolist(),
+        "prediction_count": prediction_count.tolist(),
+        "prediction_count_extended": prediction_count_extended.tolist(),
     }
 
 # If running this script directly, use the command: uvicorn your_script_name:app --reload
