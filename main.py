@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
-import pandas as pd
+
 
 # Load your trained models
 model_total = joblib.load('model_total.pkl')
