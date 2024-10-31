@@ -3,6 +3,8 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import joblib
 import pandas as pd
+from fastapi.responses import StreamingResponse
+import io
 
 # Load your trained models
 model_total = joblib.load('model_total.pkl')
@@ -29,15 +31,16 @@ async def predict_total(input_data: InputDataTotal):
     # Format predictions to two decimal points
     formatted_predictions = [round(float(pred), 2) for pred in prediction_total]
 
-    # Specify the path to the saved graph image
-    graph_path = "predicted_graph2.png"
+    # Read the graph image and convert it to a byte stream
+    with open("predicted_graph2.png", "rb") as f:
+        image_bytes = f.read()
 
-    # Return predictions and the graph image
     return {
         "prediction_total": formatted_predictions,
-        "graph_url": f"/get_graph/"
+        "graph": image_bytes  # This will return the image as bytes
     }
 
+# If you want to also serve the graph separately
 @app.get("/get_graph/")
 async def get_graph():
     # Serve the saved graph image
