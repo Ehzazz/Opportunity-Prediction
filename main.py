@@ -31,12 +31,13 @@ async def predict_total(input_data: InputDataTotal):
     
     # Make predictions
     prediction_total = model_total.predict(input_features)
-    #prediction_total_extended = model_total_extended.predict(input_features)
 
-    # Return predictions
+    # Format predictions to two decimal points
+    formatted_predictions = [round(float(pred), 2) for pred in prediction_total]
+
+    # Return formatted predictions
     return {
-        "prediction_total": prediction_total.tolist(),
-        #"prediction_total_extended": prediction_total_extended.tolist(),
+        "prediction_total": formatted_predictions,
     }
 
 @app.post("/predict/count/")
@@ -54,10 +55,14 @@ async def predict_count(input_data: InputDataCount):
     prediction_count = model_count.predict(input_features)
     prediction_count_extended = model_count_extended.predict(input_features)
 
-    # Return predictions
+    # Format predictions to two decimal points
+    formatted_prediction_count = [round(float(pred), 2) for pred in prediction_count]
+    formatted_prediction_count_extended = [round(float(pred), 2) for pred in prediction_count_extended]
+
+    # Return formatted predictions
     return {
-        "prediction_count": prediction_count.tolist(),
-        "prediction_count_extended": prediction_count_extended.tolist(),
+        "prediction_count": formatted_prediction_count,
+        "prediction_count_extended": formatted_prediction_count_extended,
     }
 
-# If running this script directly, use the command: uvicorn your_script_name:app --reload
+# If running this script directly, use the command: uvicorn your_script_name:app --reload  
