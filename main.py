@@ -1,14 +1,17 @@
+# api.py
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import joblib
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
 import base64
 from io import BytesIO
+import matplotlib.pyplot as plt
+from Averagecostprediction import plot_comparison_graph  # Import your function from ML model
 
-# Load your trained models
+# Load your trained model
 model_total = joblib.load('model_total.pkl')
 
 app = FastAPI()
@@ -17,56 +20,31 @@ app = FastAPI()
 class InputDataTotal(BaseModel):
     Year: int
 
-def create_graph():
-    # Example data for plotting
-    years = ['2022', '2023', '2024']
-    total_amounts = [1000, 1500, 2000]  # Replace with your actual data or predictions
-
-    # Create a bar chart
-    plt.figure(figsize=(8, 5))
-    bars = plt.bar(years, total_amounts, color=['blue', 'blue', 'orange'])
-
-    # Adding title and labels
-    plt.title('Total Amount for Won Opportunities of 2022, 2023, and Predicted for 2024', fontsize=16)
-    plt.xlabel('Year', fontsize=14)
-    plt.ylabel('Total Amount Won ($)', fontsize=14)
-
-    # Adding data labels on top of each bar
-    for bar in bars:
-        yval = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2, yval, f'{yval:,.2f}', ha='center', va='bottom')
-
-    # Save the plot to a BytesIO object
-    buf = BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
-    plt.close()  # Close the plot to free memory
-    return buf
-
 @app.post("/predict/total/")
 async def predict_total(input_data: InputDataTotal):
-    # Create a DataFrame from the input data
-    input_df = pd.DataFrame({
-        'Year': [input_data.Year]
-    })
-    
+    user_input_year = input_data.Year
+
+    # Ensure the year is within the expected range
+    if user_input_year < 2020 or user_input_year > 2030:
+        return JSONResponse(content={"error": "Year must be between 2020 and 2030."}, status_code=400)
+
     # Prepare input data for model prediction
-    input_features = input_df.values
+    year_array = np.array([[user_input_year]])
     
     # Make predictions
-    prediction_total = model_total.predict(input_features)
+    prediction_total = model_total.predict(year_array)
+    formatted_prediction = round(float(prediction_total[0]), 2)
 
-    # Format predictions to two decimal points
-    formatted_predictions = [round(float(pred), 2) for pred in prediction_total]
+    # Call the graph plotting function from your ML model
+    graph_buffer = plot_comparison_graph(user_input_year)  # Generate the graph for the given year
 
-    # Create the graph
-    graph_buffer = create_graph()
-
-    # Encode the graph as base64
+    # Convert the graph to base64
     graph_base64 = base64.b64encode(graph_buffer.getvalue()).decode('utf-8')
 
-    # Return predictions and graph
     return JSONResponse(content={
-        "prediction_total": formatted_predictions,
-        "graph": f"data:image/png;base64,{graph_base64}"  # Embed the graph as a base64 string
+        "prediction_total": formatted_prediction,
+        "graph": f"data:image/png;base64,{graph_base64}",  # Embed the graph as a base64 string
+        "message": f"Graph for {user_input_year} has been generated."
     })
+
+# You can run the FastAPI server and call the endpoint with a year to see the predictions and generated graph.
