@@ -20,7 +20,7 @@ from sklearn.metrics import r2_score
 # In[6]:
 
 
-dataset = pd.read_excel(r"D:\ML_model\All Opp 29-10-2024 12-36-19.xlsx")
+dataset = pd.read_excel(r"All Opp 29-10-2024 12-36-19.xlsx")
 dataset.drop(["(Do Not Modify) Row Checksum","(Do Not Modify) Opportunity", "Topic","Potential Customer","Created By",],axis=1, inplace=True)
 dataset.head(5)
 
